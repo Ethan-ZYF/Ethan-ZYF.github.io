@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Blogs on Ethan-ZYF&#39;s Blog</title>
+    <link>https://example.org/blog/</link>
+    <description>Recent content in Blogs on Ethan-ZYF&#39;s Blog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 31 Aug 2025 11:47:18 -0700</lastBuildDate>
+    <atom:link href="https://example.org/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Raft-Lab3b</title>
+      <link>https://example.org/blog/raft-lab3b/</link>
+      <pubDate>Sun, 31 Aug 2025 11:47:18 -0700</pubDate>
+      <guid>https://example.org/blog/raft-lab3b/</guid>
+      <description>&lt;p&gt;&lt;a href=&#34;https://pdos.csail.mit.edu/6.824/labs/lab-raft1.html&#34;  class=&#34;external-link&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;lab link&lt;/a&gt;&#xA;​&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Raft Note</title>
+      <link>https://example.org/blog/raft-paper-note/</link>
+      <pubDate>Sat, 30 Aug 2025 14:06:50 -0700</pubDate>
+      <guid>https://example.org/blog/raft-paper-note/</guid>
+      <description>&lt;p&gt;Notes for &lt;a href=&#34;https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf&#34;  class=&#34;external-link&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;raft&lt;/a&gt;&#xA;​&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>My First Blog</title>
+      <link>https://example.org/blog/my-first-blog/</link>
+      <pubDate>Sat, 30 Aug 2025 13:56:38 -0700</pubDate>
+      <guid>https://example.org/blog/my-first-blog/</guid>
+      <description>&lt;p&gt;Test hugo template&#xA;​&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

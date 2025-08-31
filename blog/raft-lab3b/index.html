@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  Raft-Lab3b · Ethan-ZYF&#39;s Blog
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Ethan-ZYF">
+<meta name="description" content="lab link
+​">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Raft-Lab3b">
+  <meta name="twitter:description" content="lab link ​">
+
+<meta property="og:url" content="https://example.org/blog/raft-lab3b/">
+  <meta property="og:site_name" content="Ethan-ZYF&#39;s Blog">
+  <meta property="og:title" content="Raft-Lab3b">
+  <meta property="og:description" content="lab link ​">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2025-08-31T11:47:18-07:00">
+    <meta property="article:modified_time" content="2025-08-31T11:47:18-07:00">
+    <meta property="article:tag" content="Raft">
+    <meta property="article:tag" content="System">
+
+
+
+
+<link rel="canonical" href="https://example.org/blog/raft-lab3b/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.ebdf1a5dca6a69142e979b32668c69f2a95448b145a168104c5808b14d2b75b0.css" integrity="sha256-698aXcpqaRQul5syZoxp8qlUSLFFoWgQTFgIsU0rdbA=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+
+
+</head>
+
+
+
+
+<body class="preload-transitions colorscheme-light">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://example.org/">
+      Ethan-ZYF&#39;s Blog
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/blog/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/archive/">Archive</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/contact/">Contact</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/tags/">Tags</a>
+            </li>
+          
+        
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container page">
+  <article>
+    <header>
+      <h1 class="title">
+        <a class="title-link" href="https://example.org/blog/raft-lab3b/">
+          Raft-Lab3b
+        </a>
+      </h1>
+    </header>
+
+    <p><a href="https://pdos.csail.mit.edu/6.824/labs/lab-raft1.html"  class="external-link" target="_blank" rel="noopener">lab link</a>
+​</p>
+<h1 id="深入解析">
+  <strong>深入解析 <code>raft.go</code></strong>
+  <a class="heading-link" href="#%e6%b7%b1%e5%85%a5%e8%a7%a3%e6%9e%90">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h1>
+<p>一份 Raft 一致性算法的 Go 实现</p>
+<hr>
+<h2 id="议程-agenda">
+  <strong>议程 (Agenda)</strong>
+  <a class="heading-link" href="#%e8%ae%ae%e7%a8%8b-agenda">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<ol>
+<li><strong>Raft 简介</strong>：它是什么？为什么重要？</li>
+<li><strong>核心数据结构</strong>：<code>Raft</code> 结构体的剖析</li>
+<li><strong>节点角色与状态转换</strong>：Follower, Candidate, Leader</li>
+<li><strong>两大核心 RPC</strong>：<code>RequestVote</code> &amp; <code>AppendEntries</code></li>
+<li><strong>后台驱动引擎</strong>：关键的 Goroutines</li>
+<li><strong>日志的提交与应用</strong>：从复制到执行</li>
+<li><strong>持久化与快照</strong>：代码中的 <code>TODO</code></li>
+<li><strong>总结</strong></li>
+</ol>
+<hr>
+<h2 id="1-raft-简介">
+  <strong>1. Raft 简介</strong>
+  <a class="heading-link" href="#1-raft-%e7%ae%80%e4%bb%8b">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p><strong>Raft 是一种为了易于理解而设计的共识算法。</strong></p>
+<ul>
+<li><strong>目标</strong>：在多个节点组成的集群中，就某个值（状态）达成一致，并保证系统在部分节点故障时依然可用。</li>
+<li><strong>来源</strong>：这份 <code>raft.go</code> 代码是典型的 <a href="https://pdos.csail.mit.edu/6.824/"  class="external-link" target="_blank" rel="noopener">MIT 6.824/6.5840 分布式系统课程</a> 的实验框架。</li>
+<li><strong>核心思想</strong>：将共识问题分解为三个相对独立的子问题：
+<ul>
+<li><strong>领导人选举 (Leader Election)</strong></li>
+<li><strong>日志复制 (Log Replication)</strong></li>
+<li><strong>安全性 (Safety)</strong></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-核心数据结构">
+  <strong>2. 核心数据结构：<code>Raft</code> 结构体</strong>
+  <a class="heading-link" href="#2-%e6%a0%b8%e5%bf%83%e6%95%b0%e6%8d%ae%e7%bb%93%e6%9e%84">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>所有状态都封装在 <code>Raft</code> 结构体中。
+<a href="./raft.go#L33" >type raft struct</a></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">type</span> <span style="color:#a6e22e">Raft</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">mu</span>        <span style="color:#a6e22e">sync</span>.<span style="color:#a6e22e">Mutex</span>          <span style="color:#75715e">// 互斥锁，保护共享数据</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">peers</span>     []<span style="color:#f92672">*</span><span style="color:#a6e22e">labrpc</span>.<span style="color:#a6e22e">ClientEnd</span> <span style="color:#75715e">// 与其他所有节点的 RPC 连接</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">me</span>        <span style="color:#66d9ef">int</span>                 <span style="color:#75715e">// 当前节点 ID</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// --- 持久化状态 (必须在崩溃后恢复) ---</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">currentTerm</span> <span style="color:#66d9ef">int</span>                 <span style="color:#75715e">// 当前任期号</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">votedFor</span>    <span style="color:#66d9ef">int</span>                 <span style="color:#75715e">// 在当前任期内投票给了谁</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">log</span>         []<span style="color:#a6e22e">Entry</span>             <span style="color:#75715e">// 日志条目</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// --- 易失性状态 ---</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">commitIndex</span> <span style="color:#66d9ef">int</span>                 <span style="color:#75715e">// 已知的、被提交的最高日志索引</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">lastApplied</span> <span style="color:#66d9ef">int</span>                 <span style="color:#75715e">// 已应用到状态机的最高日志索引</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// --- Leader 独有状态 ---</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">nextIndex</span>   []<span style="color:#66d9ef">int</span>               <span style="color:#75715e">// 对每个 Follower，下一个要发送的日志索引</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">matchIndex</span>  []<span style="color:#66d9ef">int</span>               <span style="color:#75715e">// 对每个 Follower，已复制的最高日志索引</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">role</span>      <span style="color:#66d9ef">int</span>                 <span style="color:#75715e">// 节点角色: Follower, Candidate, Leader</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">timeStamp</span> <span style="color:#a6e22e">time</span>.<span style="color:#a6e22e">Time</span>           <span style="color:#75715e">// 最近收到 RPC 的时间（用于选举超时）</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// ... 其他辅助字段</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><hr>
+<h2 id="3-节点角色与状态转换">
+  <strong>3. 节点角色与状态转换</strong>
+  <a class="heading-link" href="#3-%e8%8a%82%e7%82%b9%e8%a7%92%e8%89%b2%e4%b8%8e%e7%8a%b6%e6%80%81%e8%bd%ac%e6%8d%a2">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>Raft 节点有三种角色，通过 <code>role</code> 字段表示。</p>
+<ul>
+<li>
+<p><strong><code>Follower</code> (跟随者)</strong></p>
+<ul>
+<li>被动响应 Leader 和 Candidate 的请求。</li>
+<li>如果选举超时，转为 <strong>Candidate</strong>。</li>
+</ul>
+</li>
+<li>
+<p><strong><code>Candidate</code> (候选人)</strong></p>
+<ul>
+<li>发起选举，向其他节点请求投票。</li>
+<li>若获得超半数选票，转为 <strong>Leader</strong>。</li>
+<li>若收到更高任期 Leader 的心跳，转为 <strong>Follower</strong>。</li>
+</ul>
+</li>
+<li>
+<p><strong><code>Leader</code> (领导者)</strong></p>
+<ul>
+<li>处理所有客户端请求，管理日志复制。</li>
+<li>周期性发送心跳维持地位。</li>
+<li>若发现更高任期的节点，转为 <strong>Follower</strong> (<a href="./raft.go#L419" ><code>convertToFollower</code></a>)。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="4-两大核心-rpc">
+  <strong>4. 两大核心 RPC</strong>
+  <a class="heading-link" href="#4-%e4%b8%a4%e5%a4%a7%e6%a0%b8%e5%bf%83-rpc">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>Raft 的所有通信都基于两种远程过程调用 (RPC)。</p>
+<ol>
+<li>
+<p><strong><a href="./raft.go#L156" ><code>RequestVote</code></a></strong> (请求投票)</p>
+<ul>
+<li>由 <code>Candidate</code> 发起，用于选举。</li>
+</ul>
+</li>
+<li>
+<p><strong><a href="./raft.go#L212" ><code>AppendEntries</code></a></strong> (追加条目)</p>
+<ul>
+<li>由 <code>Leader</code> 发起，用于日志复制和心跳。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3 id="rpc-1">
+  <strong>RPC 1: <code>RequestVote</code> - 请求投票</strong>
+  <a class="heading-link" href="#rpc-1">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<p>当一个 Follower 选举超时后，它会成为 Candidate 并调用此 RPC。</p>
+<p><strong>处理逻辑 (<code>RequestVote</code> 函数):</strong></p>
+<ol>
+<li><strong>任期检查</strong>: 拒绝来自旧任期 (<code>args.Term &lt; rf.currentTerm</code>) 的请求。</li>
+<li><strong>投票资格</strong>: 一个任期只投一票。检查 <code>rf.votedFor</code> 是否为 <code>-1</code> 或 <code>args.CandidateId</code>。</li>
+<li><strong>安全性检查 (关键!)</strong>: 候选人的日志必须<strong>至少和自己一样新</strong>。
+<ul>
+<li>通过 <code>isCandidateLogUpToDate</code> 函数实现。</li>
+<li>比较 <code>lastLogTerm</code>，任期大的更新；任期相同，日志长的 (<code>lastLogIndex</code>) 更新。</li>
+</ul>
+</li>
+<li><strong>投票</strong>: 如果通过所有检查，则投票给该候选人 (<code>reply.VoteGranted = true</code>)，并重置自己的选举计时器。</li>
+</ol>
+<hr>
+<h3 id="rpc-2">
+  <strong>RPC 2: <code>AppendEntries</code> - 日志复制与心跳</strong>
+  <a class="heading-link" href="#rpc-2">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<p>Leader 使用此 RPC 来同步日志并维持权威。</p>
+<p><strong>处理逻辑 (<code>AppendEntries</code> 函数):</strong></p>
+<ol>
+<li><strong>任期检查</strong>: 拒绝来自旧任期的请求。</li>
+<li><strong>重置计时器</strong>: 收到合法的 RPC 就重置选举计时器 (<code>resetElectionTimer</code>)，表明 Leader 正常。</li>
+<li><strong>日志一致性检查 (核心!)</strong>:
+<ul>
+<li>Follower 检查其日志在 <code>args.PrevLogIndex</code> 处的任期是否与 <code>args.PrevLogTerm</code> 匹配。</li>
+<li><strong>匹配</strong>: 删除后续可能冲突的日志，并追加新日志。</li>
+<li><strong>不匹配</strong>: 拒绝请求，并返回信息帮助 Leader <strong>快速回退</strong> (<code>XTerm</code>, <code>XIndex</code>, <code>XLen</code>)。</li>
+</ul>
+</li>
+<li><strong>更新 Commit Index</strong>: 将本地 <code>commitIndex</code> 更新为 <code>min(args.LeaderCommit, len(rf.log)-1)</code>。</li>
+</ol>
+<hr>
+<h2 id="5-后台驱动引擎关键-goroutines">
+  <strong>5. 后台驱动引擎：关键 Goroutines</strong>
+  <a class="heading-link" href="#5-%e5%90%8e%e5%8f%b0%e9%a9%b1%e5%8a%a8%e5%bc%95%e6%93%8e%e5%85%b3%e9%94%ae-goroutines">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>Raft 节点的行为由几个并行的 Goroutine 驱动。</p>
+<ul>
+<li>
+<p><strong><code>ticker()</code></strong></p>
+<ul>
+<li><strong>选举触发器</strong>。周期性检查是否需要发起选举。</li>
+<li>如果节点不是 Leader，且距离上次收到心跳超过了<strong>随机选举超时</strong> (<code>randomizedElectionTimeout</code>)，则启动 <code>elect()</code>。</li>
+</ul>
+</li>
+<li>
+<p><strong><code>sendHeartBeats()</code></strong></p>
+<ul>
+<li><strong>Leader 的主循环</strong>。周期性 (<code>HeartBeatTimeOut</code>) 向所有 Follower 发送 <code>AppendEntries</code> RPC。</li>
+<li>同时也负责在有新日志时发送日志。</li>
+</ul>
+</li>
+<li>
+<p><strong><code>CommitChecker()</code></strong></p>
+<ul>
+<li><strong>状态机应用器</strong>。</li>
+<li>不断检查 <code>commitIndex</code> 是否大于 <code>lastApplied</code>。</li>
+<li>如果是，则将已提交的日志通过 <code>applyCh</code> 通道发送给上层应用。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="6-日志的提交与应用">
+  <strong>6. 日志的提交与应用</strong>
+  <a class="heading-link" href="#6-%e6%97%a5%e5%bf%97%e7%9a%84%e6%8f%90%e4%ba%a4%e4%b8%8e%e5%ba%94%e7%94%a8">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>这是一个重要的两阶段过程。</p>
+<ol>
+<li>
+<p><strong>提交 (Commit)</strong></p>
+<ul>
+<li>当 Leader 发现一条日志已被复制到<strong>超过半数</strong>的节点上时，该日志即为“已提交”。</li>
+<li>Leader 在 <code>advanceCommitIndex</code> 函数中通过检查 <code>matchIndex</code> 数组来更新自己的 <code>commitIndex</code>。</li>
+<li>新的 <code>commitIndex</code> 通过后续的 <code>AppendEntries</code> RPC 传递给 Follower。</li>
+</ul>
+</li>
+<li>
+<p><strong>应用 (Apply)</strong></p>
+<ul>
+<li><code>CommitChecker</code> goroutine 发现 <code>commitIndex</code> 前进。</li>
+<li>它将 <code>lastApplied</code> 和 <code>commitIndex</code> 之间的日志命令，通过 <code>applyCh</code> <strong>异步</strong>地发送给状态机。</li>
+<li><strong>解耦</strong>：Raft 核心协议的运行不被状态机执行的耗时阻塞。</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h2 id="7-持久化与快照-代码中的">
+  <strong>7. 持久化与快照 (代码中的 <code>TODO</code>)</strong>
+  <a class="heading-link" href="#7-%e6%8c%81%e4%b9%85%e5%8c%96%e4%b8%8e%e5%bf%ab%e7%85%a7-%e4%bb%a3%e7%a0%81%e4%b8%ad%e7%9a%84">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<p>为了保证系统在崩溃重启后的正确性，Raft 需要持久化。</p>
+<ul>
+<li>
+<p><strong><code>persist()</code> / <code>readPersist()</code> (Lab 3C)</strong></p>
+<ul>
+<li><strong>目标</strong>: 将关键状态 (<code>currentTerm</code>, <code>votedFor</code>, <code>log</code>) 序列化并写入稳定存储。</li>
+<li><strong>原因</strong>: 如果节点崩溃重启，必须恢复这些状态才能安全地重新加入集群，否则可能导致数据不一致（例如，在旧任期投票）。</li>
+</ul>
+</li>
+<li>
+<p><strong><code>Snapshot()</code> (Lab 3D)</strong></p>
+<ul>
+<li><strong>目标</strong>: 解决日志无限增长的问题。</li>
+<li><strong>机制</strong>: 当日志变得过长，Raft 会将日志中直到某个索引 <code>index</code> 的所有命令应用到状态机，然后将状态机的当前状态作为一个“快照”保存，并丢弃 <code>index</code> 之前的所有日志。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="总结--qa">
+  <strong>总结 &amp; Q/A</strong>
+  <a class="heading-link" href="#%e6%80%bb%e7%bb%93--qa">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<ul>
+<li><strong>Raft = 角色 + RPC + 并发</strong></li>
+<li><strong>角色</strong>: Follower, Candidate, Leader 的清晰划分简化了逻辑。</li>
+<li><strong>RPC</strong>: <code>RequestVote</code> 用于选举，<code>AppendEntries</code> 用于复制和心跳。</li>
+<li><strong>安全</strong>: 任期 (<code>Term</code>) 和日志新鲜度检查是保证一致性的基石。</li>
+<li><strong>并发</strong>: <code>ticker</code>, <code>sendHeartBeats</code>, <code>CommitChecker</code> 等 goroutines 共同驱动节点运行。</li>
+<li><strong>持久化</strong>: 是保证崩溃恢复后数据安全的关键。</li>
+</ul>
+  </article>
+</section>
+
+  
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+    2025
+     Ethan-ZYF 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

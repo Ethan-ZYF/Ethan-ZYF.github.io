@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>
+  Raft Note · Ethan-ZYF&#39;s Blog
+</title>
+  <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+
+
+
+
+<meta name="author" content="Ethan-ZYF">
+<meta name="description" content="Notes for raft
+​">
+<meta name="keywords" content="blog,developer,personal">
+
+
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Raft Note">
+  <meta name="twitter:description" content="Notes for raft ​">
+
+<meta property="og:url" content="https://example.org/blog/raft-paper-note/">
+  <meta property="og:site_name" content="Ethan-ZYF&#39;s Blog">
+  <meta property="og:title" content="Raft Note">
+  <meta property="og:description" content="Notes for raft ​">
+  <meta property="og:locale" content="en_us">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2025-08-30T14:06:50-07:00">
+    <meta property="article:modified_time" content="2025-08-30T14:06:50-07:00">
+    <meta property="article:tag" content="Raft">
+    <meta property="article:tag" content="System">
+
+
+
+
+<link rel="canonical" href="https://example.org/blog/raft-paper-note/">
+
+
+<link rel="preload" href="/fonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-regular-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+
+
+  
+  
+  <link rel="stylesheet" href="/css/coder.min.ebdf1a5dca6a69142e979b32668c69f2a95448b145a168104c5808b14d2b75b0.css" integrity="sha256-698aXcpqaRQul5syZoxp8qlUSLFFoWgQTFgIsU0rdbA=" crossorigin="anonymous" media="screen" />
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+<link rel="icon" type="image/svg+xml" href="/images/favicon.svg" sizes="any">
+<link rel="icon" type="image/png" href="/images/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/images/favicon-16x16.png" sizes="16x16">
+
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+
+<link rel="manifest" href="/site.webmanifest">
+<link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+
+
+
+
+
+
+</head>
+
+
+
+
+<body class="preload-transitions colorscheme-light">
+  
+<div class="float-container">
+    <a id="dark-mode-toggle" class="colorscheme-toggle">
+        <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+    </a>
+</div>
+
+
+  <main class="wrapper">
+    <nav class="navigation">
+  <section class="container">
+    
+    <a class="navigation-title" href="https://example.org/">
+      Ethan-ZYF&#39;s Blog
+    </a>
+    
+    
+      <input type="checkbox" id="menu-toggle" />
+      <label class="menu-button float-right" for="menu-toggle">
+        <i class="fa-solid fa-bars fa-fw" aria-hidden="true"></i>
+      </label>
+      <ul class="navigation-list">
+        
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/blog/">Blog</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/archive/">Archive</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/contact/">Contact</a>
+            </li>
+          
+            <li class="navigation-item">
+              <a class="navigation-link " href="/tags/">Tags</a>
+            </li>
+          
+        
+        
+      </ul>
+    
+  </section>
+</nav>
+
+
+    <div class="content">
+      
+  <section class="container page">
+  <article>
+    <header>
+      <h1 class="title">
+        <a class="title-link" href="https://example.org/blog/raft-paper-note/">
+          Raft Note
+        </a>
+      </h1>
+    </header>
+
+    <p>Notes for <a href="https://pdos.csail.mit.edu/6.824/papers/raft-extended.pdf"  class="external-link" target="_blank" rel="noopener">raft</a>
+​</p>
+<p>​</p>
+<h1 id="raft-an-understandable-consensus-algorithm">
+  Raft: An Understandable Consensus Algorithm
+  <a class="heading-link" href="#raft-an-understandable-consensus-algorithm">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h1>
+<h2 id="1-introduction--motivation-1-4">
+  1. Introduction &amp; Motivation [1-4]
+  <a class="heading-link" href="#1-introduction--motivation-1-4">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<ul>
+<li><strong>Problem:</strong> Consensus algorithms are crucial for reliable large-scale systems, but existing ones (especially Paxos) are difficult to understand and implement [2-4].</li>
+<li><strong>Goal:</strong> Design a new consensus algorithm, Raft, with <strong>primary goal of understandability</strong> for practical systems and education [1, 4-6].</li>
+<li><strong>Result:</strong> Raft is equivalent to (multi-)Paxos in results and efficiency, but structured differently for better understandability [1].</li>
+<li><strong>Key Techniques for Understandability:</strong>
+<ul>
+<li>Decomposition: Separates leader election, log replication, and safety [2, 5, 7].</li>
+<li>State space reduction: Enforces stronger coherency to reduce complexity [5, 7].</li>
+</ul>
+</li>
+<li><strong>User Study Results:</strong> Raft significantly easier for students to learn than Paxos (33 out of 43 students scored higher on Raft questions) [2, 8, 9].</li>
+<li><strong>Novel Features of Raft:</strong>
+<ul>
+<li><strong>Strong Leader:</strong> Log entries flow only from leader to other servers, simplifying replicated log management [8, 10-12].</li>
+<li><strong>Leader Election:</strong> Uses randomized timers to resolve conflicts simply and rapidly [10, 13].</li>
+<li><strong>Membership Changes:</strong> New &ldquo;joint consensus&rdquo; approach guarantees safety using overlapping majorities during transitions [10, 14-16].</li>
+</ul>
+</li>
+</ul>
+<h2 id="2-replicated-state-machines-17-20">
+  2. Replicated State Machines [17-20]
+  <a class="heading-link" href="#2-replicated-state-machines-17-20">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<ul>
+<li><strong>Concept:</strong> Collection of servers computes identical copies of the same state, remaining operational even if some servers fail [18].</li>
+<li><strong>Implementation:</strong> Typically uses a <strong>replicated log</strong> containing a series of commands executed in order by state machines [19, 20].</li>
+<li><strong>Role of Consensus Algorithm:</strong> Keeps the replicated log consistent, ensuring all logs eventually contain the same requests in the same order, even with server failures [20, 21].</li>
+<li><strong>Properties of Practical Consensus Algorithms:</strong>
+<ul>
+<li><strong>Safety:</strong> Never returns an incorrect result under non-Byzantine conditions (network delays, partitions, packet loss) [21].</li>
+<li><strong>Availability:</strong> Functional as long as a majority of servers are operational and can communicate [22].</li>
+<li><strong>No Timing Dependency for Consistency:</strong> Faulty clocks or extreme message delays only cause availability issues, not inconsistency [22].</li>
+<li><strong>Performance:</strong> Commands complete quickly (single RPC round-trip to a majority) in the common case, without impact from slow minority servers [23].</li>
+</ul>
+</li>
+</ul>
+<h2 id="3-whats-wrong-with-paxos-23-32">
+  3. What&rsquo;s Wrong with Paxos? [23-32]
+  <a class="heading-link" href="#3-whats-wrong-with-paxos-23-32">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<ul>
+<li><strong>Dominance:</strong> Paxos has been the primary consensus algorithm for a decade, taught widely and influencing implementations [3, 23].</li>
+<li><strong>Drawbacks:</strong>
+<ul>
+<li><strong>Difficult to Understand:</strong> Notoriously opaque, even with simplified explanations; few understand the complete protocol [3, 24-26, 31].</li>
+<li><strong>Poor Foundation for Practical Implementations:</strong>
+<ul>
+<li>No widely agreed-upon algorithm for multi-Paxos; Lamport&rsquo;s descriptions lack details [27, 28].</li>
+<li>Architecture (single-decree decomposition) is poor for practical systems; complex for sequential log management [28, 29].</li>
+<li>Symmetric peer-to-peer core is less efficient than a leader-based approach for a series of decisions [29, 30].</li>
+<li>Practical systems often diverge significantly from Paxos, leading to unproven protocols [30, 31].</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="4-designing-for-understandability-rafts-approach-6-7-32-34">
+  4. Designing for Understandability (Raft&rsquo;s Approach) [6, 7, 32-34]
+  <a class="heading-link" href="#4-designing-for-understandability-rafts-approach-6-7-32-34">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<ul>
+<li><strong>Core Principle:</strong> Understandability was the most important and difficult goal [4, 6].</li>
+<li><strong>Design Techniques:</strong>
+<ul>
+<li><strong>Problem Decomposition:</strong> Divided problems into independent pieces (leader election, log replication, safety, membership changes) [5, 7].</li>
+<li><strong>State Space Reduction:</strong> Simplified by reducing states, increasing coherency, and eliminating nondeterminism where possible (e.g., no holes in logs, limited log inconsistency) [5, 7, 34].</li>
+<li><strong>Randomization:</strong> Used to improve understandability by reducing state space (e.g., randomized election timeouts) [34].</li>
+</ul>
+</li>
+</ul>
+<h2 id="5-the-raft-consensus-algorithm---core-principles-34-50">
+  5. The Raft Consensus Algorithm - Core Principles [34-50]
+  <a class="heading-link" href="#5-the-raft-consensus-algorithm---core-principles-34-50">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<ul>
+<li><strong>Leader-Based Approach:</strong> Elects a leader with complete responsibility for managing the replicated log [35].
+<ul>
+<li>Leader accepts client requests, replicates entries, tells servers when to apply entries [35].</li>
+<li>Simplifies log management; data flows from leader to followers [36].</li>
+<li>New leader elected if current leader fails [36].</li>
+</ul>
+</li>
+<li><strong>Three Server States:</strong>
+<ul>
+<li><strong>Leader:</strong> Handles all client requests, replicates log entries [45, 46].</li>
+<li><strong>Follower:</strong> Passive, responds to requests from leaders/candidates. Redirects clients to leader [45, 46].</li>
+<li><strong>Candidate:</strong> Used to elect a new leader [46].</li>
+</ul>
+</li>
+<li><strong>Terms:</strong>
+<ul>
+<li>Logical clock: Time divided into terms, numbered consecutively [46, 47, 49].</li>
+<li>Each term begins with an election; if successful, a single leader serves for the rest of the term [47-49].</li>
+<li>Ensures at most one leader per term (Election Safety Property) [49, 51].</li>
+<li>Servers detect obsolete information by comparing term numbers; revert to follower if term is out of date [49, 50].</li>
+</ul>
+</li>
+<li><strong>RPCs (Remote Procedure Calls):</strong>
+<ul>
+<li><strong>RequestVote RPC:</strong> Initiated by candidates during elections [37, 50].</li>
+<li><strong>AppendEntries RPC:</strong> Initiated by leaders to replicate log entries and as heartbeats [50, 52].</li>
+<li><strong>InstallSnapshot RPC:</strong> Added for transferring snapshots to lagging followers [53, 54].</li>
+<li>RPCs are retried indefinitely on failure and issued in parallel for performance [53, 55].</li>
+</ul>
+</li>
+<li><strong>Key Properties/Guarantees (Figure 3):</strong>
+<ul>
+<li><strong>Election Safety:</strong> At most one leader elected per term [42, 51].</li>
+<li><strong>Leader Append-Only:</strong> Leader only appends new entries to its log; never overwrites or deletes [43, 56].</li>
+<li><strong>Log Matching:</strong> If two logs have an entry with same index and term, they are identical up to that index [43, 57].</li>
+<li><strong>Leader Completeness:</strong> If an entry is committed in a term, it will be in logs of leaders for all higher-numbered terms [43, 58, 59].</li>
+<li><strong>State Machine Safety:</strong> If a server applies an entry at an index, no other server applies a different entry for the same index [44, 60].</li>
+</ul>
+</li>
+</ul>
+<h3 id="52-leader-election-13-37-40-51-53-61-66">
+  5.2 Leader Election [13, 37, 40, 51, 53, 61-66]
+  <a class="heading-link" href="#52-leader-election-13-37-40-51-53-61-66">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<ul>
+<li><strong>Trigger:</strong> Follower assumes no viable leader if no communication (AppendEntries RPC or RequestVote) within <code>electionTimeout</code> [40, 61].</li>
+<li><strong>Process:</strong>
+<ol>
+<li>Follower increments <code>currentTerm</code>, transitions to <strong>candidate</strong> state [40, 61].</li>
+<li>Votes for itself, sends <strong>RequestVote RPCs</strong> to other servers [40, 61].</li>
+<li>Stays candidate until:
+<ul>
+<li><strong>Wins Election:</strong> Receives votes from a majority of servers for the same term (Election Safety Property) [40, 51, 62]. Becomes leader, sends heartbeats [41, 51].</li>
+<li><strong>Another Leader Emerges:</strong> Receives AppendEntries RPC from a legitimate leader (term ≥ candidate&rsquo;s term) [40, 51, 63]. Reverts to <strong>follower</strong> state [40, 50, 63].</li>
+<li><strong>Election Timeout:</strong> No winner within the timeout [40, 62]. Starts a new election [40, 63].</li>
+</ul>
+</li>
+</ol>
+</li>
+<li><strong>Split Votes:</strong> Multiple candidates may result in no majority [63].</li>
+<li><strong>Randomized Election Timeouts:</strong> Prevents and resolves split votes quickly by spreading out server timeouts [13, 64].</li>
+<li><strong>Design Choice:</strong> Randomized retry simpler and more understandable than initial ranking system [65, 66].</li>
+</ul>
+<h3 id="53-log-replication-38-39-41-42-52-56-57-66-80">
+  5.3 Log Replication [38, 39, 41, 42, 52, 56, 57, 66-80]
+  <a class="heading-link" href="#53-log-replication-38-39-41-42-52-56-57-66-80">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<ul>
+<li><strong>Leader&rsquo;s Role:</strong> Appends client commands to its log as new entries, then replicates them to followers via <strong>AppendEntries RPCs</strong> [41, 68].</li>
+<li><strong>Log Entry Structure (Figure 6):</strong> Each entry contains a state machine command, its term number, and an integer index [69].</li>
+<li><strong>Commitment:</strong>
+<ul>
+<li>Leader decides when an entry is &ldquo;committed&rdquo; (safe to apply) [69].</li>
+<li>An entry is committed once replicated on a majority of servers by the leader that created it [70].</li>
+<li>Committing an entry also commits all preceding entries in the leader&rsquo;s log [70].</li>
+<li>Leader includes <code>commitIndex</code> in AppendEntries RPCs; followers apply entries in log order once committed [38, 71].</li>
+</ul>
+</li>
+<li><strong>Log Matching Property (Figure 3):</strong>
+<ul>
+<li>If two entries have the same index and term, they store the same command [43, 57].</li>
+<li>If two entries have the same index and term, all preceding entries in those logs are identical [43, 57].</li>
+<li>Guaranteed by <code>AppendEntries</code> <strong>consistency check</strong>: Leader sends <code>prevLogIndex</code> and <code>prevLogTerm</code>; follower rejects if its log doesn&rsquo;t match [52, 72].</li>
+</ul>
+</li>
+<li><strong>Handling Inconsistencies:</strong>
+<ul>
+<li>Leader crashes can leave logs inconsistent [73].</li>
+<li>Leader forces follower logs to duplicate its own by <strong>overwriting conflicting entries</strong> [75, 76].</li>
+<li>Leader maintains <code>nextIndex</code> for each follower (index of next entry to send) [39, 77].</li>
+<li>If AppendEntries fails due to inconsistency, leader decrements <code>nextIndex</code> and retries until logs match [41, 77, 78].</li>
+<li>Optimization: Follower can include conflicting term and first index for that term to speed up <code>nextIndex</code> decrement [78, 79].</li>
+<li>Leader never overwrites its own log (Leader Append-Only Property) [43, 56].</li>
+</ul>
+</li>
+</ul>
+<h3 id="54-safety-42-44-58-60-80-94">
+  5.4 Safety [42-44, 58-60, 80-94]
+  <a class="heading-link" href="#54-safety-42-44-58-60-80-94">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<ul>
+<li><strong>Core Challenge:</strong> Ensure all state machines execute the same commands in the same order (State Machine Safety) [60, 80, 94].</li>
+<li><strong>Election Restriction:</strong>
+<ul>
+<li>A candidate cannot win an election unless its log contains all committed entries [45, 58, 84].</li>
+<li>Implemented via RequestVote RPC: Voter denies vote if its log is &ldquo;more up-to-date&rdquo; than candidate&rsquo;s [52, 85].</li>
+<li>&ldquo;Up-to-date&rdquo; defined by comparing last log entry&rsquo;s term (later term is better) and then log length (longer is better if terms are same) [86].</li>
+<li>Ensures Leader Completeness Property: Leaders contain all previously committed entries [43, 58, 81, 84].</li>
+</ul>
+</li>
+<li><strong>Committing Entries from Previous Terms:</strong>
+<ul>
+<li>A leader only commits entries from its <em>current term</em> by counting replicas [88].</li>
+<li>Once a current term entry is committed, all prior entries are indirectly committed due to Log Matching Property [88].</li>
+<li>This conservative approach avoids issues like Figure 8, where an older entry on a majority might still be overwritten [87, 88].</li>
+<li>Raft retains original term numbers for log entries, simplifying reasoning [89].</li>
+</ul>
+</li>
+<li><strong>Safety Argument (Proof Sketch):</strong>
+<ul>
+<li>Leader Completeness Property ensures that if leaderT commits an entry, all future leaders (leaderU) will also store it [43, 58, 59, 93].</li>
+<li>Relies on the voter in an election having the committed entry and voting for leaderU, which must then be at least as up-to-date as the voter [90-92].</li>
+<li>State Machine Safety Property (no two servers apply different entries for the same index) is proven from Leader Completeness and Log Matching [44, 60].</li>
+<li>Servers apply entries in log index order, ensuring identical command sequences [94].</li>
+</ul>
+</li>
+</ul>
+<h3 id="55-follower-and-candidate-crashes-55-95">
+  5.5 Follower and Candidate Crashes [55, 95]
+  <a class="heading-link" href="#55-follower-and-candidate-crashes-55-95">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<ul>
+<li><strong>Handling:</strong> Much simpler than leader crashes [55].</li>
+<li><strong>Mechanism:</strong> RPCs to crashed servers fail; Raft retries indefinitely. If server restarts, RPC completes [55].</li>
+<li><strong>Idempotency:</strong> Raft RPCs are idempotent, so retries cause no harm (e.g., duplicate log entries are ignored) [95].</li>
+</ul>
+<h3 id="56-timing-and-availability-95-101">
+  5.6 Timing and Availability [95-101]
+  <a class="heading-link" href="#56-timing-and-availability-95-101">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h3>
+<ul>
+<li><strong>Safety vs. Availability:</strong> Safety must not depend on timing, but availability inevitably does [95, 96].</li>
+<li><strong>Timing Requirement for Steady Leader:</strong> <code>broadcastTime ≪ electionTimeout ≪ MTBF</code> [96].
+<ul>
+<li><code>broadcastTime</code>: Average time for server to send RPCs to all and receive responses (0.5ms to 20ms) [97, 99].</li>
+<li><code>electionTimeout</code>: Time follower waits before starting election (10ms to 500ms, typically 150-300ms recommended) [61, 97, 99, 101].</li>
+<li><code>MTBF</code>: Mean Time Between Failures for a single server (several months+) [97, 102].</li>
+</ul>
+</li>
+<li><strong>Importance:</strong> <code>broadcastTime ≪ electionTimeout</code> ensures leaders can send heartbeats reliably to prevent new elections and makes split votes unlikely [97]. <code>electionTimeout ≪ MTBF</code> ensures quick recovery after leader crashes [98].</li>
+</ul>
+<h2 id="6-cluster-membership-changes-15-16-102-116">
+  6. Cluster Membership Changes [15, 16, 102-116]
+  <a class="heading-link" href="#6-cluster-membership-changes-15-16-102-116">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<ul>
+<li><strong>Challenge:</strong> Changing server configuration (e.g., adding/removing servers) safely without downtime [102, 103].</li>
+<li><strong>Unsafe Direct Switch:</strong> Atomically switching all servers is impossible; can lead to two leaders being elected for the same term (split brain) [103, 104].</li>
+<li><strong>Two-Phase Approach: Joint Consensus (Raft&rsquo;s Mechanism)</strong> [14, 15]
+<ul>
+<li><strong>Phase 1: Transition to <code>Cold,new</code> (Joint Consensus):</strong>
+<ul>
+<li>Leader creates <code>Cold,new</code> configuration entry in its log and replicates it [15, 106, 107].</li>
+<li><code>Cold,new</code> combines old (<code>Cold</code>) and new (<code>Cnew</code>) configurations [15].</li>
+<li>Log entries replicated to all servers in both <code>Cold</code> and <code>Cnew</code> [15].</li>
+<li>Any server from <code>Cold</code> or <code>Cnew</code> can be leader [105].</li>
+<li>Agreement (elections, commitment) requires separate majorities from <em>both</em> <code>Cold</code> and <code>Cnew</code> [105, 106].</li>
+<li>Servers use the latest configuration in their log (whether committed or not) [107].</li>
+<li>Ensures safety: <code>Cold</code> and <code>Cnew</code> cannot make unilateral decisions [105, 108, 109].</li>
+</ul>
+</li>
+<li><strong>Phase 2: Transition to <code>Cnew</code>:</strong>
+<ul>
+<li>Once <code>Cold,new</code> is committed, leader creates <code>Cnew</code> entry and replicates it [105, 108].</li>
+<li>Agreement now requires a majority of <code>Cnew</code> [105, 109].</li>
+<li>Old configuration is irrelevant; servers not in <code>Cnew</code> can be shut down [109].</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>Additional Issues:</strong>
+<ul>
+<li><strong>New Servers Catch-up:</strong> New servers join as <strong>non-voting members</strong> first, replicating log entries until caught up, to avoid availability gaps [109, 110].</li>
+<li><strong>Leader Not in New Configuration:</strong> Leader steps down after committing the <code>Cnew</code> log entry [111].</li>
+<li><strong>Removed Servers Disruption:</strong> Removed servers might time out and start new elections, causing current leader to revert to follower state [112].
+<ul>
+<li><strong>Solution:</strong> Servers disregard <code>RequestVote</code> RPCs if they receive them within minimum election timeout of hearing from current leader [113].</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="7-log-compaction-snapshotting-54-114-117-129">
+  7. Log Compaction (Snapshotting) [54, 114, 117-129]
+  <a class="heading-link" href="#7-log-compaction-snapshotting-54-114-117-129">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<ul>
+<li><strong>Problem:</strong> Log grows indefinitely, consuming space and increasing replay time [114].</li>
+<li><strong>Solution: Snapshotting:</strong>
+<ul>
+<li>Writes the entire current system state to a snapshot on stable storage [117].</li>
+<li>Discards the entire log up to that point [117].</li>
+<li>Each server takes snapshots <strong>independently</strong>, covering committed entries in its log [119, 125].</li>
+<li>Snapshot includes <code>last included index</code> and <code>last included term</code> (for <code>AppendEntries</code> consistency check) and latest cluster configuration [119, 120].</li>
+<li>Allows deleting old log entries and prior snapshots [121].</li>
+</ul>
+</li>
+<li><strong>Leader Sending Snapshots:</strong>
+<ul>
+<li>Leader sends snapshots to <strong>lagging followers</strong> (or new servers) using <code>InstallSnapshot RPC</code> [54, 121].</li>
+<li>When follower receives snapshot, it discards its entire log (or prefix if snapshot describes it) and resets its state machine [124].</li>
+</ul>
+</li>
+<li><strong>Why Independent Snapshots (vs. Leader-based):</strong>
+<ul>
+<li>Saves network bandwidth (followers produce locally) [126].</li>
+<li>Simpler leader implementation (doesn&rsquo;t block new client requests) [127].</li>
+<li>Justified departure from strong leader: consensus already reached for snapshot data [125].</li>
+</ul>
+</li>
+<li><strong>Performance Considerations:</strong>
+<ul>
+<li><strong>When to Snapshot:</strong> Fixed log size threshold [127, 128].</li>
+<li><strong>Writing Snapshots:</strong> Use copy-on-write techniques (e.g., <code>fork</code> on Linux) to avoid delaying normal operations [128, 129].</li>
+</ul>
+</li>
+</ul>
+<h2 id="8-client-interaction-129-134">
+  8. Client Interaction [129-134]
+  <a class="heading-link" href="#8-client-interaction-129-134">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<ul>
+<li><strong>Client Requests:</strong> All requests sent to the leader [130].</li>
+<li><strong>Finding the Leader:</strong>
+<ul>
+<li>Clients connect to a random server [130].</li>
+<li>Followers redirect clients to the known leader (AppendEntries RPCs include leader&rsquo;s address) [46, 130].</li>
+<li>If leader crashes, clients time out and retry with random servers [130].</li>
+</ul>
+</li>
+<li><strong>Linearizable Semantics (each operation appears to execute instantaneously, exactly once):</strong>
+<ul>
+<li><strong>Avoiding Duplicate Execution:</strong> Clients assign unique serial numbers to commands; state machine tracks latest processed serial number and response, re-sends response for duplicates [131, 132].</li>
+<li><strong>Linearizable Reads (avoiding stale data):</strong>
+<ol>
+<li>Leader must commit a <code>no-op</code> entry from its current term to ensure it knows all committed entries [133].</li>
+<li>Leader must exchange heartbeat messages with a majority of the cluster <em>before</em> responding to read-only requests, to ensure it hasn&rsquo;t been deposed [134].</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="9-implementation-and-evaluation-9-100-101-134-150">
+  9. Implementation and Evaluation [9, 100, 101, 134-150]
+  <a class="heading-link" href="#9-implementation-and-evaluation-9-100-101-134-150">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<ul>
+<li><strong>Implementation:</strong> C++ implementation (2000 lines), open-source [134, 135]. Many third-party implementations and company deployments [135].</li>
+<li><strong>Understandability (User Study):</strong>
+<ul>
+<li><strong>Methodology:</strong> Students learned Raft and Paxos (videos, quizzes), order varied [136-138]. Favored Paxos (prior experience, longer video) [139].</li>
+<li><strong>Results:</strong> Participants scored an average of 4.9 points higher on Raft quiz (out of 60) [9].</li>
+<li><strong>Self-Reported:</strong> Overwhelming majority (33 of 41) found Raft easier to implement and explain [141, 142].</li>
+</ul>
+</li>
+<li><strong>Correctness:</strong>
+<ul>
+<li>Formal specification in TLA+ (400 lines) [142, 143].</li>
+<li>Mechanically proven Log Completeness Property [143].</li>
+<li>Informal proof of State Machine Safety property [144].</li>
+</ul>
+</li>
+<li><strong>Performance:</strong>
+<ul>
+<li><strong>Log Replication:</strong> Similar to Paxos, minimal messages (single round-trip to half the cluster) [147]. Supports batching and pipelining [148].</li>
+<li><strong>Leader Election:</strong>
+<ul>
+<li><strong>Convergence:</strong> Randomized election timeouts ensure quick convergence [13, 148]. Small randomness (5ms) significantly reduces downtime (median 287ms) [150].</li>
+<li><strong>Downtime:</strong> Can be reduced by lowering election timeouts (e.g., 12-24ms results in 35ms average downtime) [100].</li>
+<li><strong>Constraint:</strong> Lowering timeouts too much violates timing requirements, causing availability problems [100, 101].</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="10-related-work-11-12-16-101-115-116-151-155">
+  10. Related Work [11, 12, 16, 101, 115, 116, 151-155]
+  <a class="heading-link" href="#10-related-work-11-12-16-101-115-116-151-155">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<ul>
+<li><strong>Comparison to Paxos:</strong>
+<ul>
+<li><strong>Raft&rsquo;s Strong Leadership:</strong> Essential part of consensus, concentrates functionality in leader [11, 12]. Simpler, easier to understand [12].</li>
+<li><strong>Paxos Leadership:</strong> Orthogonal, only a performance optimization; requires separate consensus and election mechanisms [12].</li>
+</ul>
+</li>
+<li><strong>Comparison to Viewstamped Replication (VR) and ZooKeeper:</strong>
+<ul>
+<li>Like Raft, they are leader-based and share many advantages over Paxos [152].</li>
+<li>Raft has less mechanism by minimizing non-leader functionality (e.g., log entries flow only from leader) [152].</li>
+<li>Raft uses fewer message types (4 vs. 10 for VR/ZooKeeper for basic consensus and membership changes) [153, 154].</li>
+</ul>
+</li>
+<li><strong>Egalitarian Paxos (EPaxos):</strong>
+<ul>
+<li>Leaderless approach, can achieve higher performance with commuting commands (one round-trip) [155].</li>
+<li>Balances load, lower latency in WAN settings [115].</li>
+<li>Adds significant complexity to Paxos [115].</li>
+</ul>
+</li>
+<li><strong>Membership Changes (Comparison):</strong>
+<ul>
+<li>Raft&rsquo;s joint consensus leverages existing consensus protocol, requires little additional mechanism [16].</li>
+<li>Allows processing normal requests during changes; unlike VR (stops processing) or SMART (imposes limits) [16, 116].</li>
+</ul>
+</li>
+</ul>
+<h2 id="11-conclusion-116-156-157">
+  11. Conclusion [116, 156, 157]
+  <a class="heading-link" href="#11-conclusion-116-156-157">
+    <i class="fa-solid fa-link" aria-hidden="true" title="Link to heading"></i>
+    <span class="sr-only">Link to heading</span>
+  </a>
+</h2>
+<ul>
+<li><strong>Importance of Understandability:</strong> As crucial as correctness, efficiency, and conciseness for practical implementations [116, 156].</li>
+<li><strong>Raft&rsquo;s Contribution:</strong> A new algorithm that is more understandable than Paxos and provides a better foundation for system building [156, 157].</li>
+<li><strong>Design Process:</strong> Prioritizing understandability (decomposition, state space reduction) improved correctness as well [157].</li>
+</ul>
+  </article>
+</section>
+
+  
+
+    </div>
+
+    <footer class="footer">
+  <section class="container">
+    ©
+    
+    2025
+     Ethan-ZYF 
+    ·
+    
+    Powered by <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> & <a href="https://github.com/luizdepra/hugo-coder/" target="_blank" rel="noopener">Coder</a>.
+    
+  </section>
+</footer>
+
+  </main>
+
+  
+
+  
+  
+  <script src="/js/coder.min.6ae284be93d2d19dad1f02b0039508d9aab3180a12a06dcc71b0b0ef7825a317.js" integrity="sha256-auKEvpPS0Z2tHwKwA5UI2aqzGAoSoG3McbCw73gloxc="></script>
+  
+
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</body>
+</html>

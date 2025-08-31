@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Ethan-ZYF&#39;s Blog</title>
+    <link>https://example.org/tags/</link>
+    <description>Recent content in Tags on Ethan-ZYF&#39;s Blog</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 31 Aug 2025 11:47:18 -0700</lastBuildDate>
+    <atom:link href="https://example.org/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Raft</title>
+      <link>https://example.org/tags/raft/</link>
+      <pubDate>Sun, 31 Aug 2025 11:47:18 -0700</pubDate>
+      <guid>https://example.org/tags/raft/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>System</title>
+      <link>https://example.org/tags/system/</link>
+      <pubDate>Sun, 31 Aug 2025 11:47:18 -0700</pubDate>
+      <guid>https://example.org/tags/system/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Blogging</title>
+      <link>https://example.org/tags/blogging/</link>
+      <pubDate>Sat, 30 Aug 2025 13:56:38 -0700</pubDate>
+      <guid>https://example.org/tags/blogging/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>First-Post</title>
+      <link>https://example.org/tags/first-post/</link>
+      <pubDate>Sat, 30 Aug 2025 13:56:38 -0700</pubDate>
+      <guid>https://example.org/tags/first-post/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Hugo</title>
+      <link>https://example.org/tags/hugo/</link>
+      <pubDate>Sat, 30 Aug 2025 13:56:38 -0700</pubDate>
+      <guid>https://example.org/tags/hugo/</guid>
+      <description></description>
+    </item>
+  </channel>
+</rss>
